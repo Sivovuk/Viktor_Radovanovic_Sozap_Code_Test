@@ -7,25 +7,43 @@ public class SaveJSON : MonoBehaviour
 {
     string path = "Assets/Resource/Levels-JSON";
 
-    IEnumerator Start()
+    private static SaveJSON instance;
+
+    public static SaveJSON Instance => instance;
+
+    public void Awake() 
     {
-        yield return new WaitForSeconds(2);
-        SerializeLevelData(LevelsManager.Instance.level.GetComponent<LevelData>());
+        instance = this;
     }
 
-    public void SerializeLevelData(LevelData levelData)
+    public string SerializeLevelData(LevelDataEnteti levelDataEnteti)
     {
-        LevelDataEnteti temp = new LevelDataEnteti(levelData.GetTiles, levelData.GetBoxes, 0, 1);
-
-        string json = JsonUtility.ToJson(temp);
-
-        SaveData(json);
+        string json = JsonUtility.ToJson(levelDataEnteti);
+        return json;
     }
 
-    public void SaveData(string json) 
+    public void SaveData(List<LevelDataEnteti> levelDataEnteti)
     {
-        StreamWriter writer = new StreamWriter(path, true);
-        writer.WriteLine(json);
+        StreamWriter writer = new StreamWriter(path, false);
+
+        Debug.Log(levelDataEnteti);
+        foreach (LevelDataEnteti data in levelDataEnteti)
+        {
+            string temp = SerializeLevelData(data);
+            writer.WriteLine(temp);
+        }
         writer.Close();
+    }
+
+    public void FirstSave(List<GameObject> levelDataEnteti) 
+    {
+        List<LevelDataEnteti> levelData = new List<LevelDataEnteti>();
+
+        foreach (GameObject data in levelDataEnteti)
+        {
+            levelData.Add(data.GetComponent<LevelData>().GetLevelDataEnteti);
+        }
+
+        SaveData(levelData);
     }
 }

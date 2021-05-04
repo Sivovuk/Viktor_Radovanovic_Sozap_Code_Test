@@ -70,21 +70,21 @@ public class PlayerController : MonoBehaviour
 
         if (tile == null) return;
 
-
-
         if (tile.CompareTag("Grass-tile") || tile.CompareTag("Holder-tile"))
         {
             transform.position = newPosition;
+            //Debug.Log("Pomera igraca");
         }
         else if (tile.CompareTag("Box-tile"))
         {
-            //Debug.Log("Pomera kutiju");
 
             bool tileBool = tile.GetComponent<TileManager>().MoveTile(direction);
 
             if (tileBool)
             {
                 transform.position = newPosition;
+                LevelsManager.Instance.CheckScore();
+                //Debug.Log("Pomera kutiju");
             }
         }
         else

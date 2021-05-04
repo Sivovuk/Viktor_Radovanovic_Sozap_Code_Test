@@ -8,6 +8,15 @@ public class MenuManager : MonoBehaviour
     public bool isMainMenu = false;
     public bool isMainGame = false;
 
+    private static MenuManager instance;
+
+    public static MenuManager Instance => instance;
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
     private void Start()
     {
         if (isMainGame)

@@ -13,28 +13,14 @@ public class TileManager : MonoBehaviour
     //                          V
 
 
-    //private bool isBox, isPlaceHolder, isWall, isGrass = false;
     private bool isMoveable = false;
 
     private void Awake()
     {
         if (gameObject.CompareTag("Box-tile")) 
         {
-            //isBox = true;
             isMoveable = true;
         }
-        //else if (gameObject.CompareTag("Holder-tile"))
-        //{
-        //    isPlaceHolder = true;
-        //}
-        //else if (gameObject.CompareTag("Wall-tile"))
-        //{
-        //    isWall = true;
-        //}
-        //else if (gameObject.CompareTag("Grass-tile"))
-        //{
-        //    isGrass = true;
-        //}
     }
 
     public bool MoveTile(int direction) 
@@ -43,10 +29,14 @@ public class TileManager : MonoBehaviour
         {
             if (CheckTheNextTile(direction))
             {
-                LevelsManager.Instance.CheckScore();
+                //Debug.LogError("pomera tile");
                 return true;
             }
-            else return false;
+            else
+            {
+                //Debug.LogError("ne pomera tile");
+                return false;
+            }
         }
         else
         {
@@ -95,11 +85,13 @@ public class TileManager : MonoBehaviour
 
         if (check)
         {
+            //Debug.LogError("kutija se pomera " + new Vector2(x, y));
             transform.position = new Vector2(x, y);
             return true;
         }
-        else 
+        else
         {
+            //Debug.LogError("kutija se ne pomera");
             return false;
         }
     }

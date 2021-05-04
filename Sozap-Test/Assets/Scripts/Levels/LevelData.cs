@@ -4,32 +4,37 @@ using UnityEngine;
 
 public class LevelData : MonoBehaviour
 {
-    public LevelDataEnteti levelData;
+    [SerializeField]
+    private LevelDataEnteti levelDataEnteti = new LevelDataEnteti();
 
-    public int GetBoxes { get { return levelData.boxes; } set { levelData.boxes = value; } }
+    [SerializeField]
+    private int boxes;
 
-    public List<GameObject> GetTiles { get { return levelData.tiles; } set { levelData.tiles = value; } }
+    [Space(10)]
+
+    [SerializeField]
+    private List<GameObject> tiles = new List<GameObject>();
+    [SerializeField]
+    private Vector2 playerStartPos = new Vector2();
+
+    public int GetLevelIndex { get { return levelDataEnteti.levelIndex; } set { levelDataEnteti.levelIndex = value; } }
+    public int GetBestTime { get { return levelDataEnteti.bestTime; } set { levelDataEnteti.bestTime = value; } }
+    public int GetTimePlayed { get { return levelDataEnteti.timePlayed; } set { levelDataEnteti.timePlayed = value; } }
+    public int GetBoxes { get { return boxes; } set { boxes = value; } }
+    public int GetLevelPass { get { return levelDataEnteti.levelPassed; } set { levelDataEnteti.levelPassed = value; } }
+
+    public List<GameObject> GetTiles { get { return tiles; } set { tiles = value; } }
+
+    public LevelDataEnteti GetLevelDataEnteti { get { return levelDataEnteti; } set { levelDataEnteti = value; } }
+
+    public Vector2 GetPlayerStartPosition { get { return playerStartPos; } set { playerStartPos = value; } }
 }
 
 [System.Serializable]
 public class LevelDataEnteti
 {
     public int levelIndex;
-    public int version;
-
-    public int boxes;
     public int bestTime;
     public int timePlayed;
-
-    [Space(10)]
-
-    public List<GameObject> tiles = new List<GameObject>();
-
-    public LevelDataEnteti(List<GameObject> tiles, int boxes, int bestTime, int timePlayed)
-    {
-        this.tiles = tiles;
-        this.boxes = boxes;
-        this.bestTime = bestTime;
-        this.timePlayed = timePlayed;
-    }
+    public int levelPassed = 0; //  0 = no, 1 = yes
 }
