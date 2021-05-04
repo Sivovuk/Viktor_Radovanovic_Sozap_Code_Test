@@ -12,6 +12,7 @@ public class TileManager : MonoBehaviour
     // 4 = left                 |
     //                          V
 
+    public GameObject effect;
 
     private bool isMoveable = false;
 
@@ -102,6 +103,11 @@ public class TileManager : MonoBehaviour
 
         if (tile.tag == "Grass-tile" || tile.tag == "Holder-tile")
         {
+            if (tile.tag == "Holder-tile")
+            {
+                GameObject spawn = Instantiate(effect, position, Quaternion.identity);
+                Destroy(spawn, 2);
+            }
             return true;
         }
         else 

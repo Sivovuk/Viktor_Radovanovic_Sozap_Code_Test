@@ -24,18 +24,27 @@ public class SaveJSON : MonoBehaviour
 
     public void SaveData(List<LevelDataEnteti> levelDataEnteti)
     {
-        StreamWriter writer = new StreamWriter(path, false);
-
-        Debug.Log(levelDataEnteti);
-        foreach (LevelDataEnteti data in levelDataEnteti)
+        if (levelDataEnteti != null)
         {
-            string temp = SerializeLevelData(data);
-            writer.WriteLine(temp);
+            StreamWriter writer = new StreamWriter(path, false);
+
+            foreach (LevelDataEnteti data in levelDataEnteti)
+            {
+                //Debug.Log(data.levelIndex);
+                //Debug.Log(data.timePlayed);
+                //Debug.Log(data.levelPassed);
+                string temp = SerializeLevelData(data);
+                writer.WriteLine(temp);
+            }
+            writer.Close();
         }
-        writer.Close();
+        else 
+        {
+            Debug.LogError("nema podatak za upis");
+        }
     }
 
-    public void FirstSave(List<GameObject> levelDataEnteti) 
+    public List<LevelDataEnteti> FirstSave(List<GameObject> levelDataEnteti) 
     {
         List<LevelDataEnteti> levelData = new List<LevelDataEnteti>();
 
@@ -45,5 +54,7 @@ public class SaveJSON : MonoBehaviour
         }
 
         SaveData(levelData);
+
+        return levelData;
     }
 }

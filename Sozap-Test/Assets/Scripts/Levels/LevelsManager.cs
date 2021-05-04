@@ -1,30 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class LevelsManager : MonoBehaviour
 {
     private int timer;
+    private float timePass;
+    private bool isLevelStarted = false;
 
     [SerializeField]
-    private List<GameObject> levels = new List<GameObject>();
+    private List<GameObject> LevelPrefabs = new List<GameObject>();
 
-    public List<GameObject> Getlevels { get { return levels; } set { levels = value; } }
-
-    private List<LevelData> levelData = new List<LevelData>();
+    public List<GameObject> GetLevelPrefabs { get { return LevelPrefabs; } set { LevelPrefabs = value; } }
 
     [SerializeField]
+    private List<LevelData> LoadedLevelData = new List<LevelData>();
+
+    [Space(10)]
+
     public GameObject currentLevel;
-    [SerializeField]
     public LevelData currentLevelData;
 
-    [Space(20)]
+    [Space(10)]
+
     public List<GameObject> selectedTiles = new List<GameObject>();
+
+    [Space(10)]
 
     public GameObject levelPassedUI;
     public GameObject gamePassedUI;
 
     public GameObject player;
+
+    [Space(10)]
+
+    public TextMeshProUGUI textTimer;
 
     private static LevelsManager instance;
 
@@ -37,65 +48,83 @@ public class LevelsManager : MonoBehaviour
         LoadLevel();
     }
 
+    private void Update()
+    {
+        if (isLevelStarted)
+        {
+            timePass += Time.deltaTime;
+
+            if (timePass >= 1) 
+            {
+                timer++;
+                int minutes = (int)(timer / 60);
+                int sec = Mathf.Abs(((int)(timer / 60) * 60) - timer);
+                textTimer.text = string.Format("{0:D2}:{1:D2}", minutes, sec);
+                timePass = 0;
+            }
+        }
+    }
 
     #region Load Levels
 
     public void LoadLevel()
     {
-        selectedTiles = new List<GameObject>();
-
-        int levelIndex = PlayerPrefs.GetInt(SelectLevel.LEVEL_KEY) - 1;
-
         List<LevelDataEnteti> temp = new List<LevelDataEnteti>();
+
         temp = LoadJSON.Instance.LoadData();
 
         if (temp != null)
         {
-            for (int i = 0; i < levelData.Count; i++)
+            LoadedLevelData = new List<LevelData>();
+
+            for (int i = 0; i < temp.Count; i++)
             {
-                levelData[i].GetLevelDataEnteti = temp[i];
+                if (LoadedLevelData.Count < 4)
+                {
+                    LoadedLevelData.Add(LevelPrefabs[i].GetComponent<LevelData>());
+                    LoadedLevelData[i].GetLevelDataEnteti = temp[i];
+                }
+                else
+                {
+                    LoadedLevelData[i].GetLevelDataEnteti = temp[i];
+                }
             }
         }
 
-        currentLevel = levels[levelIndex];
-        currentLevelData = levels[levelIndex].GetComponent<LevelData>();
-
-        for (int i = 0; i < transform.childCount; i++)
-        {
-            Destroy(transform.GetChild(i).gameObject);
-        }
-
-        GameObject spawnLevel = Instantiate(levels[levelIndex]);
-        spawnLevel.transform.parent = transform;
-
-        currentLevel = spawnLevel;
-        currentLevelData = spawnLevel.GetComponent<LevelData>();
-
-        player.transform.position = currentLevelData.GetPlayerStartPosition;
+        CreateLevel();
     }
+
+    #endregion
+
+    #region Finish Level
 
     public void FinishLevel(int score)
     {
         if (score >= currentLevel.GetComponent<LevelData>().GetBoxes)
         {
+            isLevelStarted = false;
+
             int levelIndex = PlayerPrefs.GetInt(SelectLevel.LEVEL_KEY) - 1;
 
-            Debug.LogError(levelIndex);
+            LoadedLevelData[levelIndex].GetTimePlayed++;
+            LoadedLevelData[levelIndex].GetLevelPass = 1;
 
-            levels[levelIndex].GetComponent<LevelData>().GetTimePlayed++;
-            levels[levelIndex].GetComponent<LevelData>().GetBestTime = timer;
-            levels[levelIndex].GetComponent<LevelData>().GetLevelPass = 1;
+            if (LoadedLevelData[levelIndex].GetBestTime > timer || LoadedLevelData[levelIndex].GetBestTime == 0)
+            {
+                LoadedLevelData[levelIndex].GetBestTime = timer;
+                timer = 0;
+            }
 
             List<LevelDataEnteti> temp = new List<LevelDataEnteti>();
 
-            for (int i = 0; i < levelData.Count; i++)
+            for (int i = 0; i < LoadedLevelData.Count; i++)
             {
-                temp.Add(levelData[i].GetLevelDataEnteti);
+                temp.Add(LoadedLevelData[i].GetLevelDataEnteti);
             }
 
             SaveJSON.Instance.SaveData(temp);
 
-            if (currentLevelData.GetLevelIndex < 3)
+            if (currentLevelData.GetLevelIndex < 4)
             {
                 PlayerPrefs.SetInt(SelectLevel.LEVEL_KEY, currentLevelData.GetLevelIndex + 1);
                 levelPassedUI.SetActive(true);
@@ -105,6 +134,40 @@ public class LevelsManager : MonoBehaviour
                 gamePassedUI.SetActive(true);
             }
         }
+    }
+
+    #endregion
+
+    #region Create Levels
+
+    public void CreateLevel()
+    {
+        selectedTiles = new List<GameObject>();
+
+        int levelIndex = PlayerPrefs.GetInt(SelectLevel.LEVEL_KEY) - 1;
+
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            Destroy(transform.GetChild(i).gameObject);
+        }
+
+        GameObject spawnLevel = Instantiate(LevelPrefabs[levelIndex]);
+        spawnLevel.transform.parent = transform;
+
+        currentLevel = spawnLevel;
+
+        currentLevelData = spawnLevel.GetComponent<LevelData>();
+
+        currentLevelData.GetLevelDataEnteti.bestTime = LoadedLevelData[levelIndex].GetLevelDataEnteti.bestTime;
+
+        currentLevelData.GetLevelDataEnteti.levelPassed = LoadedLevelData[levelIndex].GetLevelDataEnteti.levelPassed;
+
+        currentLevelData.GetLevelDataEnteti.timePlayed = LoadedLevelData[levelIndex].GetLevelDataEnteti.timePlayed;
+
+
+        player.transform.position = currentLevelData.GetPlayerStartPosition;
+
+        isLevelStarted = true;
     }
 
     #endregion

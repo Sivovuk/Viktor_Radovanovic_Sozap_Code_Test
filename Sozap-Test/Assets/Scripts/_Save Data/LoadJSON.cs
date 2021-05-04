@@ -29,8 +29,8 @@ public class LoadJSON : MonoBehaviour
     {
         if (!File.Exists(path))
         {
-            SaveJSON.Instance.FirstSave(LevelsManager.Instance.Getlevels);
-            return null;
+            List<LevelDataEnteti> temp = SaveJSON.Instance.FirstSave(LevelsManager.Instance.GetLevelPrefabs);
+            return temp;
         }
 
         List<LevelDataEnteti> levelData = new List<LevelDataEnteti>();

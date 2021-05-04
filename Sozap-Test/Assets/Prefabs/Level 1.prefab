@@ -147,9 +147,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelDataEnteti:
     levelIndex: 1
-    bestTime: 0
-    timePlayed: 0
-    levelPassed: 0
+    bestTime: 1
+    timePlayed: 4
+    levelPassed: 1
   boxes: 2
   tiles:
   - {fileID: 2657024386926580697}
